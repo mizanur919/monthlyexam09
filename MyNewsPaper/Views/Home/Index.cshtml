@@ -1,0 +1,182 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">CRUD For NewsPaper</h2>
+        <hr style="border:1px solid #2980b9"/>
+        <p class="text-right">Welcome Ms. @ViewData["user"]<a href="/Login/Logout" class="btn btn-primary" style="margin-left:10px">Log Out</a></p>
+        <div class="form-group">
+            <label for="nid" class="col-md-2">ID:</label>
+            <div class="col-md-10">
+                <input type="text" id="nid" class="form-control" />
+                <br />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="title" class="col-md-2">Title:</label>
+            <br />
+            <div class="col-md-10">
+                <input type="text" id="title" class="form-control" />
+                <br />
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="des" class="col-md-2">Description:</label>
+            <br />
+            <div class="col-md-10">
+                <input type="text" id="des" class="form-control" />
+                <br />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10" style="margin-top: 20px">
+                <input type="button" id="save" value="Save" class="btn btn-success" />
+                <input type="button" id="update" value="Update" class="btn btn-info" />
+                <input type="button" id="delete" value="Delete" class="btn btn-danger" />
+            </div>
+        </div>
+    </div>
+    <hr />
+    <table class="table table-striped" id="news" style="width: 80%; margin: 0 auto">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script type="text/javascript">
+        function blank() {
+            $("#nid").val("");
+            $("#title").val("");
+            $("#des").val("");
+        }
+        function myEdit(id, title, description) {
+            $("#nid").val(id);
+            $("#title").val(title);
+            $("#des").val(description);
+        }
+        function showAllData() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:50249/api/NewsInfoApi",
+                datatype: "json",
+                contenttype: "application/json",
+                success: function (data) {
+                    var s = "";
+                    for (var i = 0; i < data.length; i++) {
+                        s += "<tr>";
+
+                        s += "<td>" + data[i].Id + "</td>";
+                        s += "<td>" + data[i].Title + "</td>";
+                        s += "<td>" + data[i].Description + "</td>";
+                        s += "<td><a class='edit btn btn-primary' href='#' onclick=\"myEdit('" +
+                            data[i].Id +
+                            "','" +
+                            data[i].Title +
+                            "','" +
+
+                            data[i].Description +
+
+                            "')\"" +
+                            "data-key=" +
+                            i +
+
+                            '>Edit</a></td>';
+                        s += "</tr>";
+                    }
+                    $("#news tbody").html(s);
+                },
+                error: function (error) {
+                    alert(error.responsetext);
+                }
+            });
+        }
+        $(document).ready(function () {
+
+            showAllData();
+
+            $("#save").click(function () {
+                var mydata = {
+                    "Id": $("#nid").val(),
+                    "Title": $("#title").val(),
+                    "Description": $("#des").val()
+                };
+                $.ajax({
+                    type: "POST",
+
+                    url: "http://localhost:50249/api/NewsInfoApi",
+                    data: JSON.stringify(mydata),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert("Data Inserted Successfully");
+                        blank();
+                        showAllData();
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    }
+                });
+            });
+            $("#update").click(function () {
+                var mydata = {
+                    "Id": $("#nid").val(),
+                    "Title": $("#title").val(),
+                    "Description": $("#des").val()
+                };
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:50249/api/NewsInfoApi/" + $("#nid").val(),
+                    data: JSON.stringify(mydata),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert("Data Updated Successfully");
+                        blank();
+                        showAllData();
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    }
+                });
+            });
+            $("#delete").click(function () {
+                var mydata = {
+                    "Id": $("#nid").val(),
+                    "Title": $("#title").val(),
+                    "Description": $("#des").val()
+                }
+                $.ajax({
+                    type: "DELETE",
+                    url: "http://localhost:50249/api/NewsInfoApi/" + $("#nid").val(),
+                    data: JSON.stringify(mydata),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert("Data Deleted Successfully");
+                        blank();
+                        showAllData();
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
